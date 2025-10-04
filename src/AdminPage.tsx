@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MeetingCalendarView from './MeetingCalendarView';
-import GoogleCalendarIntegration from './GoogleCalendarIntegration';
+import SimpleGoogleCalendar from './SimpleGoogleCalendar';
 
 // Types
 type Meeting = {
@@ -220,7 +220,7 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
   const handleGoogleCalendarSync = (googleMeetings: any[]) => {
     setLocalMeetings(googleMeetings);
     if (currentUser) {
-      addActivityLog('GOOGLE_CALENDAR_SYNC', `Synced ${googleMeetings.length} meetings from Google Calendar`);
+      addActivityLog('CALENDAR_SYNC', `Synced ${googleMeetings.length} meetings from calendar`);
     }
   };
 
@@ -761,9 +761,10 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
 
           {activeSection === 'meetings' && (
             <div>
-              <GoogleCalendarIntegration
+              <SimpleGoogleCalendar
+                onMeetingsUpdate={handleGoogleCalendarSync}
+                isConnected={isGoogleCalendarConnected}
                 onConnectionChange={handleGoogleCalendarConnection}
-                onMeetingsSync={handleGoogleCalendarSync}
               />
               <MeetingCalendarView
                 meetings={localMeetings}
