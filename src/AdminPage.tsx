@@ -45,6 +45,9 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('day');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [users, setUsers] = useState<User[]>([]);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [userForm, setUserForm] = useState({ fullName: '', username: '', role: 'user' as 'admin' | 'manager' | 'user' });
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [activeSection, setActiveSection] = useState<'dashboard' | 'meetings' | 'users' | 'logs'>('dashboard');
@@ -224,6 +227,80 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
     }
   };
 
+  // User management functions
+  const handleCreateUser = () => {
+    if (!userForm.fullName || !userForm.username) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    // Check if username already exists
+    if (users.some(u => u.username === userForm.username)) {
+      alert('Username already exists');
+      return;
+    }
+
+    const newUser: User = {
+      id: Date.now().toString(),
+      username: userForm.username,
+      fullName: userForm.fullName,
+      role: userForm.role,
+      lastLogin: new Date().toISOString()
+    };
+
+    const updatedUsers = [...users, newUser];
+    setUsers(updatedUsers);
+    localStorage.setItem('meetingUsers', JSON.stringify(updatedUsers));
+    
+    addActivityLog('USER_CREATED', `Created user "${newUser.fullName}" with role ${newUser.role}`);
+    setUserForm({ fullName: '', username: '', role: 'user' });
+    setShowUserForm(false);
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setUserForm({ fullName: user.fullName, username: user.username, role: user.role });
+    setShowUserForm(true);
+  };
+
+  const handleUpdateUser = () => {
+    if (!editingUser || !userForm.fullName || !userForm.username) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    // Check if username already exists (excluding current user)
+    if (users.some(u => u.username === userForm.username && u.id !== editingUser.id)) {
+      alert('Username already exists');
+      return;
+    }
+
+    const updatedUsers = users.map(u => 
+      u.id === editingUser.id 
+        ? { ...u, fullName: userForm.fullName, username: userForm.username, role: userForm.role }
+        : u
+    );
+    
+    setUsers(updatedUsers);
+    localStorage.setItem('meetingUsers', JSON.stringify(updatedUsers));
+    
+    addActivityLog('USER_UPDATED', `Updated user "${userForm.fullName}"`);
+    setUserForm({ fullName: '', username: '', role: 'user' });
+    setEditingUser(null);
+    setShowUserForm(false);
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (user && window.confirm(`Delete user "${user.fullName}"?`)) {
+      const updatedUsers = users.filter(u => u.id !== userId);
+      setUsers(updatedUsers);
+      localStorage.setItem('meetingUsers', JSON.stringify(updatedUsers));
+      
+      addActivityLog('USER_DELETED', `Deleted user "${user.fullName}"`);
+    }
+  };
+
   // Meeting management
   const handleAddMeeting = () => {
     if (!formData.title || !formData.organizer || !formData.date || !formData.startTime || !formData.endTime) {
@@ -399,10 +476,6 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
                 Sign In
               </button>
             </div>
-            
-            <p className="text-sm text-[#1a1a1a]/50 mt-6">
-              Demo: admin/admin, manager/manager, user/user
-            </p>
             
             <button
               onClick={onBackToDisplay}
@@ -802,7 +875,20 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
 
           {activeSection === 'users' && (
             <div>
-              <h3 className="text-xl font-semibold mb-6">User Management</h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold">User Management</h3>
+                <button
+                  onClick={() => {
+                    setEditingUser(null);
+                    setUserForm({ fullName: '', username: '', role: 'user' });
+                    setShowUserForm(true);
+                  }}
+                  className="px-4 py-2 bg-[#c7a268] text-white rounded-lg hover:bg-[#b8956a] transition-colors"
+                >
+                  Add User
+                </button>
+              </div>
+              
               <div className="space-y-4">
                 {users.map(user => (
                   <div key={user.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
@@ -815,11 +901,31 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
                         <p className="text-sm text-gray-600">@{user.username} • {user.role}</p>
                       </div>
                     </div>
-                    <div className="text-sm text-gray-500">
-                      Last login: {new Date(user.lastLogin).toLocaleDateString()}
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm text-gray-500 mr-4">
+                        Last login: {new Date(user.lastLogin).toLocaleDateString()}
+                      </div>
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="px-3 py-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 ))}
+                
+                {users.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No users found. Click "Add User" to create the first user.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -913,6 +1019,62 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
                 </button>
                 <button
                   onClick={resetForm}
+                  className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add/Edit User Modal */}
+        {showUserForm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+              <h3 className="text-xl font-semibold mb-4">
+                {editingUser ? 'Edit User' : 'Create New User'}
+              </h3>
+              
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={userForm.fullName}
+                  onChange={(e) => setUserForm(prev => ({ ...prev, fullName: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={userForm.username}
+                  onChange={(e) => setUserForm(prev => ({ ...prev, username: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+                <select
+                  value={userForm.role}
+                  onChange={(e) => setUserForm(prev => ({ ...prev, role: e.target.value as 'admin' | 'manager' | 'user' }))}
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="user">User</option>
+                  <option value="manager">Manager</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={editingUser ? handleUpdateUser : handleCreateUser}
+                  className="flex-1 bg-[#c7a268] text-white py-2 rounded-lg hover:bg-[#b8956a]"
+                >
+                  {editingUser ? 'Update' : 'Create'} User
+                </button>
+                <button
+                  onClick={() => {
+                    setShowUserForm(false);
+                    setEditingUser(null);
+                    setUserForm({ fullName: '', username: '', role: 'user' });
+                  }}
                   className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600"
                 >
                   Cancel
