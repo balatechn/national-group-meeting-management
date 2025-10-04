@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MeetingCalendarView from './MeetingCalendarView';
 import SimpleGoogleCalendar from './SimpleGoogleCalendar';
 

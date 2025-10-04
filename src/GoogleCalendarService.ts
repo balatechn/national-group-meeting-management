@@ -1,3 +1,6 @@
+/// <reference types="gapi" />
+/// <reference types="gapi.client.calendar-v3" />
+
 // Google Calendar API Integration Service
 // This service handles all Google Calendar operations
 
@@ -84,7 +87,7 @@ export class GoogleCalendarService {
 
     for (const calendarId of roomCalendarIds) {
       try {
-        const response = await gapi.client.calendar.events.list({
+        const response = await (gapi.client as any).calendar.events.list({
           calendarId: calendarId,
           timeMin: startDate.toISOString(),
           timeMax: endDate.toISOString(),
@@ -93,7 +96,7 @@ export class GoogleCalendarService {
         });
 
         const events = response.result.items || [];
-        allEvents.push(...events.map(event => ({
+        allEvents.push(...events.map((event: any) => ({
           id: event.id!,
           summary: event.summary || 'Untitled Meeting',
           description: event.description,
@@ -105,7 +108,10 @@ export class GoogleCalendarService {
             dateTime: event.end?.dateTime || event.end?.date || '',
             timeZone: event.end?.timeZone || 'UTC'
           },
-          attendees: event.attendees,
+          attendees: event.attendees?.map((attendee: any) => ({
+            email: attendee.email || '',
+            displayName: attendee.displayName
+          })),
           location: event.location
         })));
       } catch (error) {
@@ -140,7 +146,7 @@ export class GoogleCalendarService {
       location: meetingData.location
     };
 
-    const response = await gapi.client.calendar.events.insert({
+    const response = await (gapi.client as any).calendar.events.insert({
       calendarId: calendarId,
       resource: event
     });
@@ -178,7 +184,7 @@ export class GoogleCalendarService {
     }
     if (meetingData.location) event.location = meetingData.location;
 
-    const response = await gapi.client.calendar.events.update({
+    const response = await (gapi.client as any).calendar.events.update({
       calendarId: calendarId,
       eventId: eventId,
       resource: event
@@ -189,7 +195,7 @@ export class GoogleCalendarService {
 
   // Delete meeting
   async deleteMeeting(calendarId: string, eventId: string): Promise<void> {
-    await gapi.client.calendar.events.delete({
+    await (gapi.client as any).calendar.events.delete({
       calendarId: calendarId,
       eventId: eventId
     });
@@ -197,7 +203,7 @@ export class GoogleCalendarService {
 
   // Check room availability
   async checkRoomAvailability(calendarId: string, startTime: Date, endTime: Date): Promise<boolean> {
-    const response = await gapi.client.calendar.freebusy.query({
+    const response = await (gapi.client as any).calendar.freebusy.query({
       resource: {
         timeMin: startTime.toISOString(),
         timeMax: endTime.toISOString(),
@@ -241,6 +247,6 @@ export const ROOM_CALENDARS = {
 // Export singleton instance
 export const calendarService = new GoogleCalendarService({
   calendarId: 'primary',
-  apiKey: process.env.REACT_APP_GOOGLE_API_KEY || '',
-  clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID || ''
+  apiKey: import.meta.env.VITE_GOOGLE_API_KEY || '',
+  clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 });

@@ -11,13 +11,15 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@types/gapi": "^0.0.47",
     "@types/gapi.auth2": "^0.0.61",
     "date-fns": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/gapi": "^0.0.47",
+    "@types/gapi.client.calendar": "^3.0.12",
+    "@types/gapi.client.calendar-v3": "^0.0.4",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
