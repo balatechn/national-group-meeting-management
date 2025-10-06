@@ -300,84 +300,30 @@ function Pill({label, variant = "neutral"}: {label: string; variant?: "free" | "
 
 function VideoSection() {
   return (
-    <div className="h-full rounded-3xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative">
-      {/* Background Video */}
-      <div className="absolute inset-0">
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // Fallback to gradient background if video fails to load
-            e.currentTarget.style.display = 'none';
-          }}
-        >
-          <source src={landingVideo} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-      </div>
-
-      {/* Content Overlay - Optimized for 21.5" center section */}
-      <div className="absolute inset-0 flex flex-col text-white p-8">
-        {/* Top Section - Company Branding */}
-        <div className="text-center flex-shrink-0 mb-6">
-          <div className="h-24 w-24 rounded-3xl bg-white/20 backdrop-blur border border-white/30 mx-auto mb-4 flex items-center justify-center relative">
-            <img 
-              src="c:\Users\Admin\OneDrive\Pictures\national-logo.png.png" 
-              alt="National Group India Logo"
-              className="h-20 w-auto filter brightness-0 invert"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const fallback = e.currentTarget.parentElement?.querySelector('.center-logo-fallback') as HTMLElement;
-                if (fallback) fallback.style.display = 'block';
-              }}
-            />
-            <div className="center-logo-fallback h-12 w-12 rounded-xl bg-[#c7a268] hidden" />
-          </div>
-          <h1 className="text-5xl font-bold mb-3 drop-shadow-lg">National Group India</h1>
-          <p className="text-2xl opacity-90 mb-2 drop-shadow-md">Pioneering Infrastructure. Transforming Communities.</p>
-          <p className="text-xl opacity-75 drop-shadow-md">Since 1949 • 200+ Landmark Projects</p>
-        </div>
-
-        {/* Middle Section - Company Message */}
-        <div className="flex-1 flex items-center justify-center min-h-0">
-          <div className="text-center max-w-5xl">
-            <div className="mb-8">
-              <h2 className="text-6xl font-bold mb-6 drop-shadow-lg leading-tight">
-                Building Tomorrow's India
-              </h2>
-              <p className="text-3xl opacity-90 mb-6 drop-shadow-md">
-                Excellence in Every Foundation
-              </p>
-              <p className="text-2xl opacity-80 leading-relaxed drop-shadow-sm">
-                From infrastructure to innovation, we've been shaping India's landscape for over seven decades.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Section - Company Stats */}
-        <div className="grid grid-cols-4 gap-6 flex-shrink-0">
-          <div className="text-center p-6 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-            <div className="text-4xl font-bold mb-3 drop-shadow-md">73+</div>
-            <div className="text-lg opacity-75">Years</div>
-          </div>
-          <div className="text-center p-6 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-            <div className="text-4xl font-bold mb-3 drop-shadow-md">200+</div>
-            <div className="text-lg opacity-75">Projects</div>
-          </div>
-          <div className="text-center p-6 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-            <div className="text-4xl font-bold mb-3 drop-shadow-md">4</div>
-            <div className="text-lg opacity-75">Verticals</div>
-          </div>
-          <div className="text-center p-6 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-            <div className="text-4xl font-bold mb-3 drop-shadow-md">1000+</div>
-            <div className="text-lg opacity-75">Team</div>
-          </div>
+    <div className="h-full rounded-3xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5 relative">
+      {/* Clean Video Display */}
+      <video 
+        autoPlay 
+        loop 
+        muted 
+        playsInline
+        className="w-full h-full object-cover rounded-3xl"
+        onError={(e) => {
+          // Fallback to gradient background if video fails to load
+          e.currentTarget.style.display = 'none';
+          const fallback = e.currentTarget.parentElement?.querySelector('.video-fallback') as HTMLElement;
+          if (fallback) fallback.style.display = 'block';
+        }}
+      >
+        <source src={landingVideo} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      
+      {/* Fallback background if video fails */}
+      <div className="video-fallback hidden w-full h-full bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 rounded-3xl flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="text-4xl font-bold mb-2">National Group India</div>
+          <div className="text-xl opacity-80">Building Tomorrow's Infrastructure</div>
         </div>
       </div>
     </div>
