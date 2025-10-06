@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import MeetingCalendarView from './MeetingCalendarView';
-import SimpleGoogleCalendar from './SimpleGoogleCalendar';
+import AutoBookingCalendar from './AutoBookingCalendar';
 
 // Types
 type Meeting = {
@@ -224,6 +224,14 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
     setLocalMeetings(googleMeetings);
     if (currentUser) {
       addActivityLog('CALENDAR_SYNC', `Synced ${googleMeetings.length} meetings from calendar`);
+    }
+  };
+
+  // Handle automatic room booking
+  const handleRoomBooked = (roomBooking: any) => {
+    setLocalMeetings(prev => [...prev, roomBooking]);
+    if (currentUser) {
+      addActivityLog('AUTO_BOOKING', `Auto-booked ${roomBooking.room} for "${roomBooking.title}"`);
     }
   };
 
@@ -834,10 +842,12 @@ export default function AdminPage({ meetings, onUpdateMeetings, onBackToDisplay 
 
           {activeSection === 'meetings' && (
             <div>
-              <SimpleGoogleCalendar
-                onMeetingsUpdate={handleGoogleCalendarSync}
-                isConnected={isGoogleCalendarConnected}
-                onConnectionChange={handleGoogleCalendarConnection}
+              <AutoBookingCalendar
+                onConnectionChange={(connected) => {
+                  setIsGoogleCalendarConnected(connected);
+                }}
+                onMeetingsSync={handleGoogleCalendarSync}
+                onRoomBooked={handleRoomBooked}
               />
               <MeetingCalendarView
                 meetings={localMeetings}
