@@ -194,18 +194,18 @@ export default function SmartMeetDisplay() {
   // Off‑white base with subtle gold accent and glass cards
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-[#faf7f1] to-[#f1efe9] text-[#1a1a1a] relative overflow-hidden">
+    <div className="h-screen w-screen bg-gradient-to-br from-[#faf7f1] to-[#f1efe9] text-[#1a1a1a] relative overflow-hidden flex flex-col">
       {/* Soft vignette */}
       <div className="pointer-events-none absolute inset-0" style={{boxShadow: "inset 0 0 240px rgba(0,0,0,0.08)"}} />
 
-      {/* Header: Logo + Clock */}
-      <header className="absolute top-6 left-6 right-6 flex items-center justify-between z-20">
-        <div className="flex items-center gap-4">
+      {/* Header: Logo + Clock - Fixed height for 21.5" vertical display */}
+      <header className="flex-shrink-0 h-20 flex items-center justify-between px-8 z-20 bg-white/20 backdrop-blur border-b border-white/30">
+        <div className="flex items-center gap-6">
           <div className="relative">
             <img 
               src="c:\Users\Admin\OneDrive\Pictures\national-logo.png.png" 
               alt="National Group India Logo"
-              className="h-14 w-auto"
+              className="h-12 w-auto"
               onError={(e) => {
                 // Fallback to colored rectangle if image fails to load
                 e.currentTarget.style.display = 'none';
@@ -213,51 +213,49 @@ export default function SmartMeetDisplay() {
                 if (fallback) fallback.style.display = 'block';
               }}
             />
-            <div className="logo-fallback h-14 w-14 rounded-2xl bg-[#c7a268] hidden" />
+            <div className="logo-fallback h-12 w-12 rounded-2xl bg-[#c7a268] hidden" />
           </div>
-          <div className="text-2xl font-semibold tracking-wide">National Group India</div>
+          <div className="text-3xl font-bold tracking-wide text-[#1a1a1a]">National Group India</div>
         </div>
         <div className="flex items-center gap-4">
           <Clock now={now} />
           <button
             onClick={() => setIsAdminMode(true)}
-            className="px-3 py-2 rounded-xl bg-white/60 backdrop-blur border border-white/40 shadow-sm text-sm font-medium hover:bg-white/80 transition-colors"
+            className="px-4 py-2 rounded-xl bg-white/60 backdrop-blur border border-white/40 shadow-sm text-sm font-medium hover:bg-white/80 transition-colors"
           >
             Admin
           </button>
         </div>
       </header>
 
-      {/* Three-section vertical layout with equal proportions optimized for 21.5" */}
-      <div className="absolute inset-0 pt-24 pb-8 px-6">
-        <div className="h-full grid grid-rows-3 gap-6">
-          
-          {/* Top Section - Room A (1/3 height) */}
-          <div className="row-span-1">
-            <RoomSection 
-              room="Room A" 
-              meeting={roomNow("Room A")} 
-              nextMeeting={roomNext("Room A")}
-              position="top"
-            />
-          </div>
-
-          {/* Middle Section - Video/Company Slideshow (1/3 height) */}
-          <div className="row-span-1">
-            <VideoSection />
-          </div>
-
-          {/* Bottom Section - Room B (1/3 height) */}
-          <div className="row-span-1">
-            <RoomSection 
-              room="Room B" 
-              meeting={roomNow("Room B")} 
-              nextMeeting={roomNext("Room B")}
-              position="bottom"
-            />
-          </div>
-
+      {/* Three-section vertical layout optimized for 21.5" vertical display */}
+      <div className="flex-1 flex flex-col p-8 gap-8 min-h-0">
+        
+        {/* TOP SECTION - ROOM A (30% of available height) */}
+        <div className="flex-[3] min-h-0">
+          <RoomSection 
+            room="Room A" 
+            meeting={roomNow("Room A")} 
+            nextMeeting={roomNext("Room A")}
+            position="top"
+          />
         </div>
+
+        {/* CENTER SECTION - VIDEO/SLIDESHOW (40% of available height) */}
+        <div className="flex-[4] min-h-0">
+          <VideoSection />
+        </div>
+
+        {/* BOTTOM SECTION - ROOM B (30% of available height) */}
+        <div className="flex-[3] min-h-0">
+          <RoomSection 
+            room="Room B" 
+            meeting={roomNow("Room B")} 
+            nextMeeting={roomNext("Room B")}
+            position="bottom"
+          />
+        </div>
+
       </div>
 
       {/* Direction indicators overlay with gold gradient */}
@@ -276,10 +274,10 @@ function Clock({now}: {now: Date}) {
     return () => clearInterval(id);
   }, []);
   return (
-    <div className="px-6 py-3 rounded-xl bg-white/60 backdrop-blur border border-white/40 shadow-sm">
-      <div className="text-lg font-medium tracking-wide">
+    <div className="px-6 py-3 rounded-xl bg-white/70 backdrop-blur border border-white/50 shadow-sm">
+      <div className="text-lg font-bold tracking-wide text-[#1a1a1a]">
         {now.toLocaleDateString(undefined, {weekday: "short", month: "short", day: "2-digit"})}
-        {" · "}
+        {" • "}
         {now.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})}
       </div>
     </div>
@@ -288,12 +286,14 @@ function Clock({now}: {now: Date}) {
 
 function Pill({label, variant = "neutral"}: {label: string; variant?: "free" | "busy" | "neutral"}) {
   const map = {
-    free: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30",
-    busy: "bg-rose-500/15 text-rose-700 border-rose-500/30",
-    neutral: "bg-black/5 text-black/70 border-black/10",
+    free: "bg-emerald-500/20 text-emerald-700 border-emerald-500/40 shadow-emerald-500/20",
+    busy: "bg-rose-500/20 text-rose-700 border-rose-500/40 shadow-rose-500/20",
+    neutral: "bg-black/10 text-black/70 border-black/20",
   } as const;
   return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${map[variant]}`}>{label}</span>
+    <span className={`px-4 py-2 rounded-full text-base font-bold border shadow-lg ${map[variant]}`}>
+      {label}
+    </span>
   );
 }
 
@@ -361,49 +361,49 @@ function VideoSection() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
       </div>
 
-      {/* Content Overlay */}
-      <div className="absolute inset-0 flex flex-col justify-between text-white p-10">
+      {/* Content Overlay - Optimized for 21.5" center section */}
+      <div className="absolute inset-0 flex flex-col text-white p-8">
         {/* Top Section - Company Branding */}
-        <div className="text-center">
-          <div className="h-20 w-20 rounded-3xl bg-white/20 backdrop-blur border border-white/30 mx-auto mb-6 flex items-center justify-center relative">
+        <div className="text-center flex-shrink-0 mb-6">
+          <div className="h-24 w-24 rounded-3xl bg-white/20 backdrop-blur border border-white/30 mx-auto mb-4 flex items-center justify-center relative">
             <img 
               src="c:\Users\Admin\OneDrive\Pictures\national-logo.png.png" 
               alt="National Group India Logo"
-              className="h-16 w-auto filter brightness-0 invert"
+              className="h-20 w-auto filter brightness-0 invert"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 const fallback = e.currentTarget.parentElement?.querySelector('.center-logo-fallback') as HTMLElement;
                 if (fallback) fallback.style.display = 'block';
               }}
             />
-            <div className="center-logo-fallback h-10 w-10 rounded-xl bg-[#c7a268] hidden" />
+            <div className="center-logo-fallback h-12 w-12 rounded-xl bg-[#c7a268] hidden" />
           </div>
-          <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">National Group India</h1>
-          <p className="text-xl opacity-90 mb-2 drop-shadow-md">Pioneering Infrastructure. Transforming Communities.</p>
-          <p className="text-lg opacity-75 drop-shadow-md">Since 1949 • 200+ Landmark Projects</p>
+          <h1 className="text-5xl font-bold mb-3 drop-shadow-lg">National Group India</h1>
+          <p className="text-2xl opacity-90 mb-2 drop-shadow-md">Pioneering Infrastructure. Transforming Communities.</p>
+          <p className="text-xl opacity-75 drop-shadow-md">Since 1949 • 200+ Landmark Projects</p>
         </div>
 
         {/* Middle Section - Current Slide Content */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center max-w-4xl">
-            <div className="mb-6">
-              <h2 className="text-5xl font-bold mb-4 drop-shadow-lg animate-fade-in">
+        <div className="flex-1 flex items-center justify-center min-h-0">
+          <div className="text-center max-w-5xl">
+            <div className="mb-8">
+              <h2 className="text-6xl font-bold mb-6 drop-shadow-lg animate-fade-in leading-tight">
                 {currentSlideData.title}
               </h2>
-              <p className="text-2xl opacity-90 mb-4 drop-shadow-md">
+              <p className="text-3xl opacity-90 mb-6 drop-shadow-md">
                 {currentSlideData.subtitle}
               </p>
-              <p className="text-xl opacity-80 leading-relaxed drop-shadow-sm">
+              <p className="text-2xl opacity-80 leading-relaxed drop-shadow-sm">
                 {currentSlideData.description}
               </p>
             </div>
             
             {/* Slide Progress Indicators */}
-            <div className="flex justify-center gap-3 mt-8">
+            <div className="flex justify-center gap-4 mt-8">
               {slides.map((_, index) => (
                 <div
                   key={index}
-                  className={`h-3 w-3 rounded-full transition-all duration-500 ${
+                  className={`h-4 w-4 rounded-full transition-all duration-500 ${
                     index === currentSlide 
                       ? 'bg-white scale-125 shadow-lg' 
                       : 'bg-white/40 hover:bg-white/60'
@@ -415,22 +415,22 @@ function VideoSection() {
         </div>
 
         {/* Bottom Section - Company Stats */}
-        <div className="grid grid-cols-4 gap-6">
-          <div className="text-center p-4 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-            <div className="text-3xl font-bold mb-2 drop-shadow-md">73+</div>
-            <div className="text-sm opacity-75">Years</div>
+        <div className="grid grid-cols-4 gap-6 flex-shrink-0">
+          <div className="text-center p-6 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <div className="text-4xl font-bold mb-3 drop-shadow-md">73+</div>
+            <div className="text-lg opacity-75">Years</div>
           </div>
-          <div className="text-center p-4 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-            <div className="text-3xl font-bold mb-2 drop-shadow-md">200+</div>
-            <div className="text-sm opacity-75">Projects</div>
+          <div className="text-center p-6 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <div className="text-4xl font-bold mb-3 drop-shadow-md">200+</div>
+            <div className="text-lg opacity-75">Projects</div>
           </div>
-          <div className="text-center p-4 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-            <div className="text-3xl font-bold mb-2 drop-shadow-md">4</div>
-            <div className="text-sm opacity-75">Verticals</div>
+          <div className="text-center p-6 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <div className="text-4xl font-bold mb-3 drop-shadow-md">4</div>
+            <div className="text-lg opacity-75">Verticals</div>
           </div>
-          <div className="text-center p-4 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-            <div className="text-3xl font-bold mb-2 drop-shadow-md">1000+</div>
-            <div className="text-sm opacity-75">Team</div>
+          <div className="text-center p-6 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <div className="text-4xl font-bold mb-3 drop-shadow-md">1000+</div>
+            <div className="text-lg opacity-75">Team</div>
           </div>
         </div>
       </div>
@@ -442,80 +442,87 @@ function RoomSection({room, meeting, nextMeeting, position}: {room: string; meet
   const isBusy = !!meeting;
   
   return (
-    <div className="h-full rounded-3xl p-8 bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_20px_40px_rgba(0,0,0,0.1)] flex flex-col">
-      {/* Room Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <div className={`h-12 w-12 rounded-xl ${
-            room === "Room A" ? "bg-purple-500" : "bg-blue-500"
-          }`} />
-          <div className="text-3xl font-bold tracking-wide">{room}</div>
-        </div>
-        <Pill label={isBusy ? "Busy" : "Free"} variant={isBusy ? "busy" : "free"} />
-      </div>
-
-      {/* Current Meeting */}
-      <div className="flex-1 space-y-6">
-        <div className="rounded-2xl p-6 bg-white/80 border border-white/60">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-3 w-3 rounded-full bg-rose-500 animate-pulse" />
-            <span className="text-lg font-semibold text-black/70 uppercase tracking-wide">Now</span>
+    <div className="h-full rounded-3xl p-6 bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_20px_40px_rgba(0,0,0,0.1)] flex flex-col">
+      {/* Room Header - Optimized for 21.5" vertical display */}
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
+        <div className="flex items-center gap-6">
+          <div className={`h-16 w-16 rounded-2xl flex items-center justify-center ${
+            room === "Room A" ? "bg-gradient-to-br from-purple-500 to-purple-600" : "bg-gradient-to-br from-blue-500 to-blue-600"
+          }`}>
+            <span className="text-white text-2xl font-bold">{room.slice(-1)}</span>
           </div>
-          {meeting ? (
-            <div>
-              <div className="text-2xl font-semibold mb-3">{meeting.title}</div>
-              <div className="text-lg text-black/70 mb-3">Organizer: {meeting.organizer}</div>
-              <div className="text-lg text-black/60">
-                {fmtTime(parseISO(meeting.start))} – {fmtTime(parseISO(meeting.end))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-6">
-              <div className="text-2xl font-medium text-black/50">Room Available</div>
-              <div className="text-lg text-black/40">No current meeting</div>
-            </div>
-          )}
+          <div className="text-4xl font-bold tracking-wide text-[#1a1a1a]">{room}</div>
         </div>
+        <div className="flex-shrink-0">
+          <Pill label={isBusy ? "Busy" : "Free"} variant={isBusy ? "busy" : "free"} />
+        </div>
+      </div>
 
-        {/* Next Meeting */}
-        <div className="rounded-2xl p-6 bg-white/60 border border-white/40">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-3 w-3 rounded-full bg-blue-500" />
-            <span className="text-lg font-semibold text-black/70 uppercase tracking-wide">Next</span>
+      {/* Meeting Content - Optimized spacing */}
+      <div className="flex-1 min-h-0 flex flex-col gap-4">
+        {/* Current Meeting Card */}
+        <div className="flex-1 rounded-2xl p-6 bg-white/80 border border-white/60 flex flex-col">
+          <div className="flex items-center gap-3 mb-4 flex-shrink-0">
+            <div className="h-4 w-4 rounded-full bg-rose-500 animate-pulse" />
+            <span className="text-xl font-bold text-black/70 uppercase tracking-wide">NOW</span>
           </div>
-          {nextMeeting ? (
-            <div>
-              <div className="text-2xl font-semibold mb-3">{nextMeeting.title}</div>
-              <div className="text-lg text-black/70 mb-3">Organizer: {nextMeeting.organizer}</div>
-              <div className="text-lg text-black/60">
-                {fmtTime(parseISO(nextMeeting.start))} – {fmtTime(parseISO(nextMeeting.end))}
+          <div className="flex-1 flex flex-col justify-center">
+            {meeting ? (
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-3 text-[#1a1a1a]">{meeting.title}</div>
+                <div className="text-xl text-black/70 mb-3">Organizer: {meeting.organizer}</div>
+                <div className="text-lg text-black/60 font-medium">
+                  {fmtTime(parseISO(meeting.start))} – {fmtTime(parseISO(meeting.end))}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="text-center py-6">
-              <div className="text-2xl font-medium text-black/50">No upcoming meetings</div>
-              <div className="text-lg text-black/40">Schedule available</div>
-            </div>
-          )}
+            ) : (
+              <div className="text-center">
+                <div className="text-3xl font-bold text-emerald-600 mb-2">Room Available</div>
+                <div className="text-xl text-black/50">No current meeting</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Next Meeting Card */}
+        <div className="flex-1 rounded-2xl p-6 bg-white/60 border border-white/40 flex flex-col">
+          <div className="flex items-center gap-3 mb-4 flex-shrink-0">
+            <div className="h-4 w-4 rounded-full bg-blue-500" />
+            <span className="text-xl font-bold text-black/70 uppercase tracking-wide">NEXT</span>
+          </div>
+          <div className="flex-1 flex flex-col justify-center">
+            {nextMeeting ? (
+              <div className="text-center">
+                <div className="text-2xl font-semibold mb-3 text-[#1a1a1a]">{nextMeeting.title}</div>
+                <div className="text-lg text-black/70 mb-3">Organizer: {nextMeeting.organizer}</div>
+                <div className="text-base text-black/60 font-medium">
+                  {fmtTime(parseISO(nextMeeting.start))} – {fmtTime(parseISO(nextMeeting.end))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className="text-2xl font-semibold text-black/50 mb-2">No upcoming meetings</div>
+                <div className="text-lg text-black/40">Schedule available</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Room Direction Indicator */}
-      <div className="mt-6 pt-6 border-t border-white/40">
-        <div className="flex items-center justify-center gap-4">
-          {isBusy && (
-            <>
-              <div className={`h-12 w-12 rounded-xl bg-[#c7a268] grid place-items-center animate-pulse`}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-7 w-7 text-white">
-                  <path d="M5 12h14" strokeWidth="2" strokeLinecap="round"/>
-                  <path d={position === "top" ? "M10 7l-5 5 5 5" : "M14 17l5-5-5-5"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <span className="text-lg font-medium text-[#c7a268]">Room in Use</span>
-            </>
-          )}
+      {/* Room Direction Indicator - Fixed position */}
+      {isBusy && (
+        <div className="mt-6 pt-4 border-t border-white/40 flex-shrink-0">
+          <div className="flex items-center justify-center gap-4">
+            <div className={`h-12 w-12 rounded-xl bg-[#c7a268] grid place-items-center animate-pulse shadow-lg`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-7 w-7 text-white">
+                <path d="M5 12h14" strokeWidth="2" strokeLinecap="round"/>
+                <path d={position === "top" ? "M10 7l-5 5 5 5" : "M14 17l5-5-5-5"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="text-xl font-bold text-[#c7a268]">Room in Use</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
