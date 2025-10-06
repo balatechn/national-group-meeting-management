@@ -231,8 +231,8 @@ export default function SmartMeetDisplay() {
       {/* Three-section vertical layout optimized for 21.5" vertical display */}
       <div className="flex-1 flex flex-col p-8 gap-8 min-h-0">
         
-        {/* TOP SECTION - ROOM A (30% of available height) */}
-        <div className="flex-[3] min-h-0">
+        {/* TOP SECTION - ROOM A (35% of available height) */}
+        <div className="flex-[35] min-h-0">
           <RoomSection 
             room="Room A" 
             meeting={roomNow("Room A")} 
@@ -241,13 +241,13 @@ export default function SmartMeetDisplay() {
           />
         </div>
 
-        {/* CENTER SECTION - VIDEO/SLIDESHOW (40% of available height) */}
-        <div className="flex-[4] min-h-0">
+        {/* CENTER SECTION - VIDEO/SLIDESHOW (30% of available height) */}
+        <div className="flex-[30] min-h-0">
           <VideoSection />
         </div>
 
-        {/* BOTTOM SECTION - ROOM B (30% of available height) */}
-        <div className="flex-[3] min-h-0">
+        {/* BOTTOM SECTION - ROOM B (35% of available height) */}
+        <div className="flex-[35] min-h-0">
           <RoomSection 
             room="Room B" 
             meeting={roomNow("Room B")} 
