@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState} from "react";
 import AdminPage from "./src/AdminPage";
+import landingVideo from "./src/landing.mp4";
 
 // SmartMeet Display – Vertical signage layout for two adjacent rooms
 // Notes:
@@ -298,65 +299,24 @@ function Pill({label, variant = "neutral"}: {label: string; variant?: "free" | "
 }
 
 function VideoSection() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  
-  // National Group India images and content from their website
-  const slides = [
-    {
-      image: "https://nationalgroupindia.com/home/2.webp",
-      title: "A Legacy of Growth",
-      subtitle: "Cement mixer operations",
-      description: "Our journey began with Sheik Ahmed — a freedom fighter whose vision was rooted in uplifting communities."
-    },
-    {
-      image: "https://nationalgroupindia.com/home/3.webp", 
-      title: "Infrastructure Excellence",
-      subtitle: "Trucks parked in construction site",
-      description: "From a modest contracting firm, we built a legacy of integrity, quality, and trust."
-    },
-    {
-      image: "https://nationalgroupindia.com/home/4.webp",
-      title: "Building Under Construction", 
-      subtitle: "What Sets Us Apart From Others",
-      description: "Excellence is our non-negotiable standard with 73 years of experience."
-    },
-    {
-      image: "https://nationalgroupindia.com/hel/01.webp",
-      title: "Heritage Projects",
-      subtitle: "Driving Tomorrow's Modern India", 
-      description: "Delivering world-class civil engineering solutions for over seven decades."
-    },
-    {
-      image: "https://nationalgroupindia.com/home/5.webp",
-      title: "Let's Build Something Timeless",
-      subtitle: "Construction site excellence",
-      description: "Building a stronger, more resilient India for generations."
-    }
-  ];
-
-  // Auto-advance slides every 8 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [slides.length]);
-
-  const currentSlideData = slides[currentSlide];
-
   return (
     <div className="h-full rounded-3xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative">
-      {/* Background Image Slideshow */}
+      {/* Background Video */}
       <div className="absolute inset-0">
-        <img 
-          src={currentSlideData.image}
-          alt={currentSlideData.title}
-          className="w-full h-full object-cover transition-opacity duration-1000"
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="w-full h-full object-cover"
           onError={(e) => {
-            // Fallback to gradient background if image fails
+            // Fallback to gradient background if video fails to load
             e.currentTarget.style.display = 'none';
           }}
-        />
+        >
+          <source src={landingVideo} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
       </div>
@@ -383,33 +343,19 @@ function VideoSection() {
           <p className="text-xl opacity-75 drop-shadow-md">Since 1949 • 200+ Landmark Projects</p>
         </div>
 
-        {/* Middle Section - Current Slide Content */}
+        {/* Middle Section - Company Message */}
         <div className="flex-1 flex items-center justify-center min-h-0">
           <div className="text-center max-w-5xl">
             <div className="mb-8">
-              <h2 className="text-6xl font-bold mb-6 drop-shadow-lg animate-fade-in leading-tight">
-                {currentSlideData.title}
+              <h2 className="text-6xl font-bold mb-6 drop-shadow-lg leading-tight">
+                Building Tomorrow's India
               </h2>
               <p className="text-3xl opacity-90 mb-6 drop-shadow-md">
-                {currentSlideData.subtitle}
+                Excellence in Every Foundation
               </p>
               <p className="text-2xl opacity-80 leading-relaxed drop-shadow-sm">
-                {currentSlideData.description}
+                From infrastructure to innovation, we've been shaping India's landscape for over seven decades.
               </p>
-            </div>
-            
-            {/* Slide Progress Indicators */}
-            <div className="flex justify-center gap-4 mt-8">
-              {slides.map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-4 w-4 rounded-full transition-all duration-500 ${
-                    index === currentSlide 
-                      ? 'bg-white scale-125 shadow-lg' 
-                      : 'bg-white/40 hover:bg-white/60'
-                  }`}
-                />
-              ))}
             </div>
           </div>
         </div>
